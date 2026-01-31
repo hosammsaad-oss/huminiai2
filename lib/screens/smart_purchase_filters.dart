@@ -512,8 +512,9 @@ class SmartPurchaseIntegration {
     Map<String, double> categories = {};
 
     for (var t in transactions) {
-      if (t.type == 'income') income += t.amount;
-      else {
+      if (t.type == 'income') {
+        income += t.amount;
+      } else {
         expense += t.amount;
         categories[t.category] = (categories[t.category] ?? 0) + t.amount;
       }

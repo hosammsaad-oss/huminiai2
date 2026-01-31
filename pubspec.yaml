@@ -32,11 +32,11 @@ dependencies:
   share_plus: ^7.1.0
   sensors_plus: ^6.1.1
   permission_handler: ^11.0.0
-
-
-
-
-
+  timeago: ^3.5.0
+  cached_network_image: ^3.3.0
+  video_player: ^2.10.1
+  chewie: ^1.7.1
+  
 
 
   # --- تم تحديث هذا السطر لإصدار أحدث وأكثر استقراراً ---
@@ -66,6 +66,7 @@ dependencies:
   confetti: ^0.8.0
   firebase_messaging: ^15.2.10
   webview_flutter: ^4.13.1
+  firebase_storage: ^12.4.10
   
 dev_dependencies:
   flutter_test:

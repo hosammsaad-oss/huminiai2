@@ -25,7 +25,8 @@ import 'productivity_stats_screen.dart';
 import 'social_leagues_screen.dart';
 // تأكد من أن المسار يطابق مكان حفظ ملف الداشبورد لديك
 import 'smart_purchase_analysis_page.dart';
-
+import 'package:humini_ai/screens/new_purchase_screen.dart'; // مسار صفحة الشراء
+import 'accounts_agent_screen.dart'; // مسار صفحة الحسابات
 
 
 
@@ -463,6 +464,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+
+
+  //_______________________________________________________________________________
+  // الازرار في الشريط الجانبي 
   Widget _buildLifeManagerDrawer(
     BuildContext context,
     List<TaskModel> tasks,
@@ -485,6 +490,33 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 children: [
                   _buildThemeTile(themeMode),
                   const Divider(),
+                            // 2. وكيل الحسابات الذكي
+
+
+      ListTile(
+        leading: const Icon(Icons.account_balance_wallet_rounded, color: Colors.blue),
+        title: Text("وكيل الحسابات الذكي", style: GoogleFonts.tajawal()),
+        onTap: () {
+          Navigator.pop(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const AccountsAgentScreen()),
+          );
+        },
+      ),
+
+      // 1. وكيل الشراء الذكي
+      ListTile(
+        leading: const Icon(Icons.auto_awesome, color: Colors.orange),
+        title: Text("وكيل الشراء الذكي", style: GoogleFonts.tajawal()),
+        onTap: () {
+          Navigator.pop(context); // إغلاق الدرور
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const NewPurchaseScreen()),
+          );
+        },
+      ),
                   _buildDrawerTile(
                     Icons.analytics_rounded,
                     "بصيرة هوميني الذكية 📊",
@@ -497,6 +529,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       );
                     },
                   ),
+                  
                   _buildDrawerTile(
                     Icons.emoji_events_outlined,
                     "ساحة المنافسة 🏆",
@@ -509,6 +542,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       );
                     },
                   ),
+
+      
+
+
+
+
+                  
                   ListTile(
   leading: const Icon(Icons.analytics_outlined, color: Colors.blue),
   title: const Text('التحليل المالي الذكي'),
@@ -524,6 +564,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
     );
   },
+  
 ),
                   _buildDrawerTile(Icons.public_rounded, "ساحة المجتمع 🌎", () {
                     Navigator.push(
