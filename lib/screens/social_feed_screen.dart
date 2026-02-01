@@ -9,6 +9,11 @@ import 'package:image_picker/image_picker.dart';
 import 'package:chewie/chewie.dart';
 import 'package:video_player/video_player.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+// أضف الاستيراد في أعلى ملف السوشيال ميديا
+import 'profile_page.dart';
+
+
+
 
 class SocialFeedScreen extends ConsumerStatefulWidget {
   const SocialFeedScreen({super.key});
@@ -21,52 +26,67 @@ class _SocialFeedScreenState extends ConsumerState<SocialFeedScreen> {
   final Color primaryColor = const Color(0xFF6B4EFF);
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF0F2F5), // لون خلفية شبيه بفيسبوك لكن ألطف
-      appBar: AppBar(
-        elevation: 0.5,
-        backgroundColor: Colors.white,
-        centerTitle: false,
-        title: Text(
-          "يونيكورن هب ✨",
-          style: GoogleFonts.tajawal(fontWeight: FontWeight.bold, color: primaryColor),
+Widget build(BuildContext context) {
+  return Scaffold(
+    backgroundColor: const Color(0xFFF0F2F5), // لون خلفية شبيه بفيسبوك لكن ألطف
+    appBar: AppBar(
+      elevation: 0.5,
+      backgroundColor: Colors.white,
+      centerTitle: false,
+      title: Text(
+        "يونيكورن هب ✨",
+        style: GoogleFonts.tajawal(fontWeight: FontWeight.bold, color: primaryColor),
+      ),
+      actions: [
+        // --- زر تسجيل الخروج الجديد ---
+        IconButton(
+          icon: const Icon(Icons.exit_to_app_rounded, color: Colors.redAccent),
+          onPressed: () async {
+            await FirebaseAuth.instance.signOut();
+            // سيقوم الـ AuthWrapper في ملف main.dart بنقلك تلقائياً لصفحة اللوجن
+          },
         ),
-        actions: [
-          IconButton(icon: const Icon(Icons.notifications_none_rounded, color: Colors.black87), onPressed: () {}),
-          IconButton(icon: const Icon(Icons.search_rounded, color: Colors.black87), onPressed: () {}),
-        ],
-      ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('posts')
-            .orderBy('timestamp', descending: true)
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return _buildEmptyState();
-          }
+        // ----------------------------
+        IconButton(
+          icon: const Icon(Icons.notifications_none_rounded, color: Colors.black87),
+          onPressed: () {},
+        ),
+        IconButton(
+          icon: const Icon(Icons.search_rounded, color: Colors.black87),
+          onPressed: () {},
+        ),
+      ],
+    ),
+    body: StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('posts')
+          .orderBy('timestamp', descending: true)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return _buildEmptyState();
+        }
 
-          return ListView.builder(
-            itemCount: snapshot.data!.docs.length,
-            itemBuilder: (context, index) {
-              final postDoc = snapshot.data!.docs[index];
-              final postData = postDoc.data() as Map<String, dynamic>;
-              return PostCard(postData: postData, postId: postDoc.id);
-            },
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: primaryColor,
-        child: const Icon(Icons.add_photo_alternate_rounded, color: Colors.white),
-        onPressed: () => _showCreatePostModal(context),
-      ),
-    );
-  }
+        return ListView.builder(
+          itemCount: snapshot.data!.docs.length,
+          itemBuilder: (context, index) {
+            final postDoc = snapshot.data!.docs[index];
+            final postData = postDoc.data() as Map<String, dynamic>;
+            return PostCard(postData: postData, postId: postDoc.id);
+          },
+        );
+      },
+    ),
+    floatingActionButton: FloatingActionButton(
+      backgroundColor: primaryColor,
+      child: const Icon(Icons.add_photo_alternate_rounded, color: Colors.white),
+      onPressed: () => _showCreatePostModal(context),
+    ),
+  );
+}
 
   // --- دالة عرض نافذة النشر ---
   void _showCreatePostModal(BuildContext context) {
@@ -100,7 +120,7 @@ class PostCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildHeader(),
+          _buildHeader(context),
           if (postData['content'] != null && postData['content'].isNotEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -113,23 +133,46 @@ class PostCard extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader() {
-    return ListTile(
-      leading: CircleAvatar(
-        backgroundImage: CachedNetworkImageProvider(postData['authorPic'] ?? 'https://via.placeholder.com/150'),
-      ),
-      title: Text(postData['authorName'] ?? "عضو يونيكورن", style: GoogleFonts.tajawal(fontWeight: FontWeight.bold, fontSize: 14)),
-      subtitle: const Text("منذ قليل", style: TextStyle(fontSize: 10)),
-      trailing: OutlinedButton(
-        onPressed: () {}, // منطق Follow
-        style: OutlinedButton.styleFrom(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          side: const BorderSide(color: Color(0xFF6B4EFF)),
+
+
+
+  Widget _buildHeader(BuildContext context) { // أضفنا context هنا
+  return ListTile(
+    // هذا هو التعديل الأساسي: عند الضغط على رأس المنشور
+    onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ProfilePage(userId: postData['authorId']),
         ),
-        child: Text("متابعة", style: GoogleFonts.tajawal(fontSize: 12, color: const Color(0xFF6B4EFF))),
+      );
+    },
+    leading: CircleAvatar(
+      backgroundImage: CachedNetworkImageProvider(
+          postData['authorPic'] ?? 'https://via.placeholder.com/150'),
+    ),
+    title: Text(
+      postData['authorName'] ?? "عضو يونيكورن",
+      style: GoogleFonts.tajawal(fontWeight: FontWeight.bold, fontSize: 14),
+    ),
+    subtitle: const Text("منذ قليل", style: TextStyle(fontSize: 10)),
+    trailing: OutlinedButton(
+      onPressed: () {
+        // هنا يمكنك وضع منطق المتابعة السريع
+      },
+      style: OutlinedButton.styleFrom(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        side: const BorderSide(color: Color(0xFF6B4EFF)),
       ),
-    );
-  }
+      child: Text("متابعة",
+          style: GoogleFonts.tajawal(fontSize: 12, color: const Color(0xFF6B4EFF))),
+    ),
+  );
+}
+
+
+
+
 
   Widget _buildMediaContent(BuildContext context) {
     if (postData['mediaType'] == 'video') {

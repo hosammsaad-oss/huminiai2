@@ -27,7 +27,7 @@ import 'social_leagues_screen.dart';
 import 'smart_purchase_analysis_page.dart';
 import 'package:humini_ai/screens/new_purchase_screen.dart'; // مسار صفحة الشراء
 import 'accounts_agent_screen.dart'; // مسار صفحة الحسابات
-
+import 'profile_page.dart';
 
 
 
@@ -543,7 +543,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     },
                   ),
 
-      
+                 ListTile(
+  leading: const Icon(Icons.person),
+  title: const Text('ملفي الشخصي'),
+  onTap: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ProfilePage(userId: FirebaseAuth.instance.currentUser!.uid),
+      ),
+    );
+  },
+),
 
 
 

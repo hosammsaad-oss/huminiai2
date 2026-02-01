@@ -18,7 +18,8 @@ import 'services/notification_service.dart';
 import 'screens/home_screen.dart';
 import 'firebase_options.dart';
 import 'services/groq_service.dart';
-
+import 'screens/login_screen.dart'; 
+import 'screens/social_feed_screen.dart';
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
@@ -169,7 +170,7 @@ void main() async {
         AndroidFlutterLocalNotificationsPlugin
       >()
       ?.createNotificationChannel(channel);
-
+/*
   // 5. تسجيل الدخول المجهول إذا لم يوجد مستخدم
   if (FirebaseAuth.instance.currentUser == null) {
     try {
@@ -178,7 +179,7 @@ void main() async {
       debugPrint("Auth Error: $e");
     }
   }
-
+*/
   // 6. تشغيل التطبيق النهائي
   runApp(const ProviderScope(child: HuminiApp()));
 }
@@ -214,11 +215,33 @@ class HuminiApp extends ConsumerWidget {
         ),
         textTheme: GoogleFonts.tajawalTextTheme(ThemeData.dark().textTheme),
       ),
-      home: const SplashScreen(),
+      // التعديل هنا: نستخدم بوابة التحقق أولاً
+      home: const AuthWrapper(), 
     );
   }
 }
+class AuthWrapper extends StatelessWidget {
+  const AuthWrapper({super.key});
 
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        // إذا كان التطبيق لا يزال يتحقق من حالة الدخول
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const SplashScreen(); 
+        }
+        // إذا وجد مستخدم مسجل دخول، اذهب لشاشة السوشيال ميديا
+        if (snapshot.hasData) {
+          return const HomeScreen();
+        }
+        // إذا لم يجد مستخدم، اذهب لشاشة اللوجن فوراً
+        return const LoginScreen();
+      },
+    );
+  }
+}
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
   @override
@@ -284,7 +307,7 @@ class _SplashScreenState extends State<SplashScreen>
               ),
             ),
             const Text(
-              "حسام سعد",
+              "life OS",
               style: TextStyle(fontSize: 18, color: Colors.white70),
             ),
             const SizedBox(height: 50),
@@ -296,3 +319,19 @@ class _SplashScreenState extends State<SplashScreen>
   }
 }
 
+@override
+Widget build(BuildContext context) {
+  return MaterialApp(
+    home: StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        // إذا كان هناك بيانات مستخدم، نذهب للهوم
+        if (snapshot.hasData) {
+          return const SocialFeedScreen(); 
+        }
+        // إذا لم توجد بيانات (المستخدم خارج)، نذهب للوجن
+        return const LoginScreen();
+      },
+    ),
+  );
+}
