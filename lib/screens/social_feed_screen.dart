@@ -143,7 +143,7 @@ class PostCard extends StatelessWidget {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => ProfilePage(userId: postData['authorId']),
+          builder: (context) => EnhancedProfilePage(userId: postData['authorId']),
         ),
       );
     },

@@ -550,7 +550,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ProfilePage(userId: FirebaseAuth.instance.currentUser!.uid),
+        builder: (context) => EnhancedProfilePage(userId: FirebaseAuth.instance.currentUser!.uid),
       ),
     );
   },
